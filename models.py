@@ -1,7 +1,5 @@
-import json
-
 from flask_sqlalchemy import SQLAlchemy
-from sqlalchemy import Column, String, Integer, ForeignKey, Time, ARRAY, Date
+from sqlalchemy import Column, String, Integer, ForeignKey, Time, ARRAY, Date, Text
 
 db = SQLAlchemy()
 
@@ -77,6 +75,9 @@ class Event(db.Model):
     __tablename__ = "event"
 
     id = Column(Integer, primary_key=True)
+    name = Column(String(80), nullable=False)
+    guest_emails = Column(ARRAY(String(80)), nullable=False)
+    description = Column(Text)
     date = Column(Date, nullable=False)
     start_time = Column(Time, nullable=False)
     end_time = Column(Time, nullable=False)
@@ -85,3 +86,16 @@ class Event(db.Model):
     def insert(self):
         db.session.add(self)
         db.session.commit()
+
+    def update(self):
+        db.session.commit()
+
+    def dictionary(self):
+        return {
+            "name": self.name,
+            "guestEmails": self.guest_emails,
+            "description": self.description,
+            "date": self.date.strftime("%x"),
+            "startTime": self.start_time.isoformat(),
+            "endTime": self.end_time.isoformat()
+        }

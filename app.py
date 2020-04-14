@@ -1,14 +1,15 @@
 from flask import Flask, request, jsonify, abort
+from datetime import date
 from flask_bcrypt import Bcrypt
 from sqlalchemy.exc import IntegrityError
 
 from .auth import encode_auth_token, requires_auth
-from .models import setup_db, User, db_drop_and_create_all, Schedule
+from .models import setup_db, User, Schedule, Event, db_drop_and_create_all
 
 app = Flask(__name__)
 bcrypt = Bcrypt(app)
 setup_db(app)
-# db_drop_and_create_all()
+db_drop_and_create_all()
 
 
 @app.route("/register", methods=["POST"])
@@ -87,6 +88,29 @@ def get_schedule(user):
     if not schedule:
         return abort(404, "NOT_FOUND: No schedule found for this user.")
     return jsonify({"success": True, "schedule": schedule.dictionary()}), 200
+
+
+@app.route("/event", methods=["POST"])
+@requires_auth
+def create_event(user):
+    event_date = request.json.get("date")
+    if not event_date:
+        return abort(400, "BAD_REQUEST: Provide all required parameters.")
+    event = Event(
+        name=request.json.get("name"),
+        guest_emails=request.json.get("guestEmails"),
+        description=request.json.get("description"),
+        date=date.fromisoformat(event_date),
+        start_time=request.json.get("startTime"),
+        end_time=request.json.get("endTime"),
+        user_id=user.id
+    )
+    try:
+        event.insert()
+    except IntegrityError as exception:
+        return abort(400, "BAD_REQUEST: Unable to create event.")
+
+    return jsonify({"success": True}), 200
 
 
 if __name__ == '__main__':
