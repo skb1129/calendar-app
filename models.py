@@ -22,7 +22,6 @@ def db_drop_and_create_all():
     NOTE:  Dou can change the "database_filename" variable to have multiple versions of a database
     :return:
     """
-
     db.drop_all()
     db.create_all()
 

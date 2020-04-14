@@ -20,7 +20,7 @@ def register():
     )
     try:
         user.insert()
-    except IntegrityError as e:
+    except IntegrityError as exception:
         return abort(400, "BAD_REQUEST: Unable to register user.")
     access_token = encode_auth_token(user.username)
     return jsonify({

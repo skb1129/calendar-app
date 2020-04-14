@@ -1,7 +1,7 @@
 import jwt
 from datetime import datetime, timedelta
 from functools import wraps
-from flask import request
+from flask import request, abort
 
 from .config import SECRET_KEY
 from .models import User
@@ -19,8 +19,8 @@ def encode_auth_token(username):
             "sub": username
         }
         return jwt.encode(payload, SECRET_KEY, algorithm="HS256").decode("UTF-8")
-    except Exception as e:
-        return e
+    except TypeError as exception:
+        return exception
 
 
 def decode_auth_token(auth_token):
@@ -33,46 +33,42 @@ def decode_auth_token(auth_token):
         payload = jwt.decode(auth_token, SECRET_KEY)
         return payload.get("sub")
     except jwt.ExpiredSignatureError:
-        return "Signature expired. Please log in again."
+        return abort(401, "UNAUTHORIZED: Signature expired. Please log in again.")
     except jwt.InvalidTokenError:
-        return "Invalid token. Please log in again."
+        return abort(401, "UNAUTHORIZED: Invalid token. Please log in again.")
 
 
-def get_token_auth_header():
+def get_user_from_token():
     auth = request.headers.get('Authorization', None)
-    return auth.split()[1]
-
-
-def get_user_from_token(token):
+    if not auth:
+        return abort(400, "BAD_REQUEST: Authorization header is missing.")
+    parts = auth.split()
+    if parts[0].lower() != 'bearer':
+        return abort(400, "BAD_REQUEST: Authorization header must start with Bearer.")
+    if len(parts) != 2:
+        return abort(401, "UNAUTHORIZED: Authorization header must be Bearer token.")
+    token = parts[1]
     username = decode_auth_token(token)
-    user = User.query.get(username=username)
+    user = User.query.filter_by(username=username).first()
+    if not user:
+        return abort(401, "UNAUTHORIZED: Invalid user in the token header.")
     return user
 
 
-def requires_auth(permission=''):
+def requires_auth(f):
     """
-    Creates and returns a decorator for authentication
-    :param permission: Required permission
-    :return: requires_auth_decorator: Authentication decorator
+    :param f: Function to be wrapped
+    :return: wrapper: Wrapper function
     """
 
-    def requires_auth_decorator(f):
+    @wraps(f)
+    def wrapper(*args, **kwargs):
         """
-        :param f: Function to be wrapped
-        :return: wrapper: Wrapper function
+        This function validates and checks permission from the JWT
+        It throws an AuthError exception if permission do not match or the JWT is invalid
+        :return: f: Wrapped function with decoded JWT payload
         """
+        user = get_user_from_token()
+        return f(user, *args, **kwargs)
 
-        @wraps(f)
-        def wrapper(*args, **kwargs):
-            """
-            This function validates and checks permission from the JWT
-            It throws an AuthError exception if permission do not match or the JWT is invalid
-            :return: f: Wrapped function with decoded JWT payload
-            """
-            token = get_token_auth_header()
-            user = get_user_from_token(token)
-            return f(user, *args, **kwargs)
-
-        return wrapper
-
-    return requires_auth_decorator
+    return wrapper
