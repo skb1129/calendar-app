@@ -60,6 +60,26 @@ def save_schedule(user):
     return jsonify({"success": True}), 200
 
 
+@app.route("/schedule", methods=["PUT"])
+@requires_auth
+def update_schedule(user):
+    schedule = Schedule.query.get(user.id)
+    if not schedule:
+        return abort(404, "NOT_FOUND: No schedule found for this user.")
+    days_available = request.json.get("daysAvailable", None)
+    start_time = request.json.get("startTime", None)
+    end_time = request.json.get("endTime", None)
+    if days_available:
+        schedule.days_available = days_available
+    if start_time:
+        schedule.start_time = start_time
+    if end_time:
+        schedule.end_time = end_time
+    schedule.update()
+
+    return jsonify({"success": True}), 200
+
+
 @app.route("/schedule", methods=["GET"])
 @requires_auth
 def get_schedule(user):
