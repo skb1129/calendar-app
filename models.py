@@ -1,3 +1,5 @@
+import json
+
 from flask_sqlalchemy import SQLAlchemy
 from sqlalchemy import Column, String, Integer, ForeignKey, Time, ARRAY, Date
 
@@ -49,13 +51,20 @@ class Schedule(db.Model):
     __tablename__ = "schedule"
 
     user_id = Column(Integer, ForeignKey('user.id'), primary_key=True)
-    days_available = Column(ARRAY(String), nullable=False)
+    days_available = Column(ARRAY(Integer), nullable=False)
     start_time = Column(Time, nullable=False)
     end_time = Column(Time, nullable=False)
 
     def insert(self):
         db.session.add(self)
         db.session.commit()
+
+    def dictionary(self):
+        return {
+            "daysAvailable": self.days_available,
+            "startTime": self.start_time.isoformat(),
+            "endTime": self.end_time.isoformat()
+        }
 
 
 class Event(db.Model):

@@ -2,13 +2,13 @@ from flask import Flask, request, jsonify, abort
 from flask_bcrypt import Bcrypt
 from sqlalchemy.exc import IntegrityError
 
-from .auth import encode_auth_token
-from .models import setup_db, User, db_drop_and_create_all
+from .auth import encode_auth_token, requires_auth
+from .models import setup_db, User, db_drop_and_create_all, Schedule
 
 app = Flask(__name__)
 bcrypt = Bcrypt(app)
 setup_db(app)
-db_drop_and_create_all()
+# db_drop_and_create_all()
 
 
 @app.route("/register", methods=["POST"])
@@ -23,10 +23,8 @@ def register():
     except IntegrityError as exception:
         return abort(400, "BAD_REQUEST: Unable to register user.")
     access_token = encode_auth_token(user.username)
-    return jsonify({
-        "success": True,
-        "access_token": access_token
-    }), 201
+
+    return jsonify({"success": True, "access_token": access_token}), 201
 
 
 @app.route("/login", methods=["POST"])
@@ -41,10 +39,34 @@ def login():
     if not bcrypt.check_password_hash(user.password, password):
         return abort(409, "CONFLICT: Wrong Password")
     access_token = encode_auth_token(username)
-    return jsonify({
-        "success": True,
-        "access_token": access_token
-    }), 202
+
+    return jsonify({"success": True, "access_token": access_token}), 202
+
+
+@app.route("/schedule", methods=["POST"])
+@requires_auth
+def save_schedule(user):
+    schedule = Schedule(
+        user_id=user.id,
+        days_available=request.json.get("daysAvailable"),
+        start_time=request.json.get("startTime"),
+        end_time=request.json.get("endTime")
+    )
+    try:
+        schedule.insert()
+    except IntegrityError as exception:
+        return abort(400, "BAD_REQUEST: Unable to save schedule.")
+
+    return jsonify({"success": True}), 200
+
+
+@app.route("/schedule", methods=["GET"])
+@requires_auth
+def get_schedule(user):
+    schedule = Schedule.query.get(user.id)
+    if not schedule:
+        return abort(404, "NOT_FOUND: No schedule found for this user.")
+    return jsonify({"success": True, "schedule": schedule.dictionary()}), 200
 
 
 if __name__ == '__main__':
