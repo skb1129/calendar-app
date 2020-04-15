@@ -1,7 +1,6 @@
 from flask import Flask, request, jsonify, abort
 from datetime import date
 from flask_bcrypt import Bcrypt
-from sqlalchemy.exc import IntegrityError
 
 from .auth import encode_auth_token, requires_auth
 from .models import setup_db, User, Schedule, Event, db_drop_and_create_all
@@ -14,15 +13,16 @@ db_drop_and_create_all()
 
 @app.route("/register", methods=["POST"])
 def register():
+    username = request.json.get("username")
+    password = request.json.get("password")
+    if not username or not password:
+        return abort(400, "BAD_REQUEST: \"username\" or \"password\" not provided.")
     user = User(
-        username=request.json.get("username"),
-        password=bcrypt.generate_password_hash(request.json.get("password")).decode("UTF-8"),
+        username=username,
+        password=bcrypt.generate_password_hash(password).decode("UTF-8"),
         email=request.json.get("email")
     )
-    try:
-        user.insert()
-    except IntegrityError as exception:
-        return abort(400, "BAD_REQUEST: Unable to register user.")
+    user.insert()
     access_token = encode_auth_token(user.username)
 
     return jsonify({"success": True, "access_token": access_token}), 201
@@ -34,11 +34,9 @@ def login():
     password = request.json.get("password")
     if not username or not password:
         return abort(400, "BAD_REQUEST: \"username\" or \"password\" not provided.")
-    user = User.query.filter_by(username=username).first()
-    if not user:
-        return abort(404, "NOT_FOUND: User not found")
+    user = User.get_by_username(username)
     if not bcrypt.check_password_hash(user.password, password):
-        return abort(409, "CONFLICT: Wrong Password")
+        return abort(406, "NOT_ACCEPTABLE: Wrong Password")
     access_token = encode_auth_token(username)
 
     return jsonify({"success": True, "access_token": access_token}), 202
@@ -53,12 +51,9 @@ def save_schedule(user):
         start_time=request.json.get("startTime"),
         end_time=request.json.get("endTime")
     )
-    try:
-        schedule.insert()
-    except IntegrityError as exception:
-        return abort(400, "BAD_REQUEST: Unable to save schedule.")
+    schedule.insert()
 
-    return jsonify({"success": True}), 200
+    return jsonify({"success": True}), 201
 
 
 @app.route("/schedule", methods=["PUT"])
@@ -91,11 +86,12 @@ def get_schedule(user):
 
 
 @app.route("/event", methods=["POST"])
-@requires_auth
-def create_event(user):
+def create_event():
     event_date = request.json.get("date")
-    if not event_date:
+    username = request.json.get("username")
+    if not event_date or not username:
         return abort(400, "BAD_REQUEST: Provide all required parameters.")
+    user = User.get_by_username(username)
     event = Event(
         name=request.json.get("name"),
         guest_emails=request.json.get("guestEmails"),
@@ -105,12 +101,16 @@ def create_event(user):
         end_time=request.json.get("endTime"),
         user_id=user.id
     )
-    try:
-        event.insert()
-    except IntegrityError as exception:
-        return abort(400, "BAD_REQUEST: Unable to create event.")
+    event.insert()
 
-    return jsonify({"success": True}), 200
+    return jsonify({"success": True}), 201
+
+
+@app.route("/event", methods=["GET"])
+@requires_auth
+def get_events_for_user(user):
+    events = [event.dictionary() for event in Event.query.filter_by(user_id=user.id).all()]
+    return jsonify({"success": True, "events": events}), 200
 
 
 if __name__ == '__main__':

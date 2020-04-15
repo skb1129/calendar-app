@@ -1,5 +1,7 @@
+from flask import abort
 from flask_sqlalchemy import SQLAlchemy
 from sqlalchemy import Column, String, Integer, ForeignKey, Time, ARRAY, Date, Text
+from sqlalchemy.exc import IntegrityError
 
 db = SQLAlchemy()
 
@@ -38,8 +40,24 @@ class User(db.Model):
     email = Column(String(80))
 
     def insert(self):
-        db.session.add(self)
-        db.session.commit()
+        try:
+            db.session.add(self)
+            db.session.commit()
+        except IntegrityError as exception:
+            return abort(400, "BAD_REQUEST: Unable to register user.")
+
+    def update(self):
+        try:
+            db.session.commit()
+        except IntegrityError as exception:
+            return abort(400, "BAD_REQUEST: Unable to update user.")
+
+    @staticmethod
+    def get_by_username(username):
+        user = User.query.filter_by(username=username).first()
+        if not user:
+            return abort(404, "NOT_FOUND: User not found")
+        return user
 
 
 class Schedule(db.Model):
@@ -54,11 +72,17 @@ class Schedule(db.Model):
     end_time = Column(Time, nullable=False)
 
     def insert(self):
-        db.session.add(self)
-        db.session.commit()
+        try:
+            db.session.add(self)
+            db.session.commit()
+        except IntegrityError as exception:
+            return abort(400, "BAD_REQUEST: Unable to save schedule.")
 
     def update(self):
-        db.session.commit()
+        try:
+            db.session.commit()
+        except IntegrityError as exception:
+            return abort(400, "BAD_REQUEST: Unable to update schedule.")
 
     def dictionary(self):
         return {
@@ -84,11 +108,17 @@ class Event(db.Model):
     user_id = Column(Integer, ForeignKey('user.id'))
 
     def insert(self):
-        db.session.add(self)
-        db.session.commit()
+        try:
+            db.session.add(self)
+            db.session.commit()
+        except IntegrityError as exception:
+            return abort(400, "BAD_REQUEST: Unable to create event.")
 
     def update(self):
-        db.session.commit()
+        try:
+            db.session.commit()
+        except IntegrityError as exception:
+            return abort(400, "BAD_REQUEST: Unable to update event.")
 
     def dictionary(self):
         return {
