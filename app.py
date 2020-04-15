@@ -1,14 +1,15 @@
 from flask import Flask, request, jsonify, abort
-from datetime import date
+from datetime import date, time
 from flask_bcrypt import Bcrypt
 
 from .auth import encode_auth_token, requires_auth
 from .models import setup_db, User, Schedule, Event, db_drop_and_create_all
+from .services import validate_schedule, validate_event
 
 app = Flask(__name__)
 bcrypt = Bcrypt(app)
 setup_db(app)
-db_drop_and_create_all()
+# db_drop_and_create_all()
 
 
 @app.route("/register", methods=["POST"])
@@ -45,12 +46,17 @@ def login():
 @app.route("/schedule", methods=["POST"])
 @requires_auth
 def save_schedule(user):
+    start_time = request.json.get("startTime")
+    end_time = request.json.get("endTime")
+    if not start_time or not end_time:
+        return abort(400, "BAD_REQUEST: \"startTime\" or \"endTime\" not provided.")
     schedule = Schedule(
         user_id=user.id,
         days_available=request.json.get("daysAvailable"),
-        start_time=request.json.get("startTime"),
-        end_time=request.json.get("endTime")
+        start_time=time.fromisoformat(start_time),
+        end_time=time.fromisoformat(end_time)
     )
+    validate_schedule(schedule)
     schedule.insert()
 
     return jsonify({"success": True}), 201
@@ -62,15 +68,16 @@ def update_schedule(user):
     schedule = Schedule.query.get(user.id)
     if not schedule:
         return abort(404, "NOT_FOUND: No schedule found for this user.")
-    days_available = request.json.get("daysAvailable", None)
-    start_time = request.json.get("startTime", None)
-    end_time = request.json.get("endTime", None)
+    days_available = request.json.get("daysAvailable")
+    start_time = request.json.get("startTime")
+    end_time = request.json.get("endTime")
     if days_available:
         schedule.days_available = days_available
     if start_time:
         schedule.start_time = start_time
     if end_time:
         schedule.end_time = end_time
+    validate_schedule(schedule)
     schedule.update()
 
     return jsonify({"success": True}), 200
@@ -89,7 +96,9 @@ def get_schedule(user):
 def create_event():
     event_date = request.json.get("date")
     username = request.json.get("username")
-    if not event_date or not username:
+    start_time = request.json.get("startTime")
+    end_time = request.json.get("endTime")
+    if not event_date or not username or not start_time or not end_time:
         return abort(400, "BAD_REQUEST: Provide all required parameters.")
     user = User.get_by_username(username)
     event = Event(
@@ -97,10 +106,11 @@ def create_event():
         guest_emails=request.json.get("guestEmails"),
         description=request.json.get("description"),
         date=date.fromisoformat(event_date),
-        start_time=request.json.get("startTime"),
-        end_time=request.json.get("endTime"),
+        start_time=time.fromisoformat(start_time),
+        end_time=time.fromisoformat(end_time),
         user_id=user.id
     )
+    validate_event(event)
     event.insert()
 
     return jsonify({"success": True}), 201
