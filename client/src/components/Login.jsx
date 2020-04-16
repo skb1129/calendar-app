@@ -29,7 +29,7 @@ const useStyles = makeStyles((theme) => ({
   },
 }));
 
-function Login({ history }) {
+function Login() {
   const classes = useStyles();
   const { onLoginSuccess } = useAuth();
   const [username, setUsername] = useState("");
@@ -44,9 +44,8 @@ function Login({ history }) {
       setLoading(true);
       try {
         const { data } = await api.post("/login", { username, password });
-        onLoginSuccess(data);
         setLoading(false);
-        history.replace("/");
+        onLoginSuccess(data);
       } catch (e) {
         switch (e.response.status) {
           case 406:

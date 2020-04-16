@@ -29,7 +29,7 @@ const useStyles = makeStyles((theme) => ({
   },
 }));
 
-function Signup({ history }) {
+function Signup() {
   const classes = useStyles();
   const { onLoginSuccess } = useAuth();
   const [firstName, setFirstName] = useState("");
@@ -47,9 +47,8 @@ function Signup({ history }) {
       setLoading(true);
       try {
         const { data } = await api.post("/register", { firstName, lastName, username, email, password });
-        onLoginSuccess(data);
         setLoading(false);
-        history.replace("/");
+        onLoginSuccess(data);
       } catch (e) {
         switch (e.response.status) {
           case 400:
