@@ -47,6 +47,12 @@ def login():
     return jsonify({"success": True, "accessToken": access_token, "user": user.dictionary()}), 202
 
 
+@app.route("/api/check-auth", methods=["POST"])
+@requires_auth
+def check_auth(user):
+    return jsonify({"success": True, "user": user.dictionary()}), 202
+
+
 @app.route("/api/schedule", methods=["POST"])
 @requires_auth
 def save_schedule(user):
