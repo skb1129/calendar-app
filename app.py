@@ -14,7 +14,7 @@ setup_db(app)
 # db_drop_and_create_all()
 
 
-@app.route("/register", methods=["POST"])
+@app.route("/api/register", methods=["POST"])
 def register():
     username = request.json.get("username")
     password = request.json.get("password")
@@ -33,7 +33,7 @@ def register():
     return jsonify({"success": True, "access_token": access_token, "user": user.dictionary()}), 201
 
 
-@app.route("/login", methods=["POST"])
+@app.route("/api/login", methods=["POST"])
 def login():
     username = request.json.get("username")
     password = request.json.get("password")
@@ -47,7 +47,7 @@ def login():
     return jsonify({"success": True, "access_token": access_token, "user": user.dictionary()}), 202
 
 
-@app.route("/schedule", methods=["POST"])
+@app.route("/api/schedule", methods=["POST"])
 @requires_auth
 def save_schedule(user):
     start_time = request.json.get("startTime")
@@ -66,7 +66,7 @@ def save_schedule(user):
     return jsonify({"success": True}), 201
 
 
-@app.route("/schedule", methods=["PUT"])
+@app.route("/api/schedule", methods=["PUT"])
 @requires_auth
 def update_schedule(user):
     schedule = Schedule.query.get(user.id)
@@ -87,7 +87,7 @@ def update_schedule(user):
     return jsonify({"success": True}), 200
 
 
-@app.route("/schedule", methods=["GET"])
+@app.route("/api/schedule", methods=["GET"])
 @requires_auth
 def get_schedule(user):
     schedule = Schedule.query.get(user.id)
@@ -96,7 +96,7 @@ def get_schedule(user):
     return jsonify({"success": True, "schedule": schedule.dictionary()}), 200
 
 
-@app.route("/event", methods=["POST"])
+@app.route("/api/event", methods=["POST"])
 def create_event():
     event_date = request.json.get("date")
     username = request.json.get("username")
@@ -120,7 +120,7 @@ def create_event():
     return jsonify({"success": True}), 201
 
 
-@app.route("/event", methods=["GET"])
+@app.route("/api/event", methods=["GET"])
 @requires_auth
 def get_events_for_user(user):
     events = [event.dictionary() for event in Event.query.filter_by(user_id=user.id).all()]
