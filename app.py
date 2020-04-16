@@ -9,6 +9,8 @@ from .services import validate_schedule, validate_event
 app = Flask(__name__)
 bcrypt = Bcrypt(app)
 setup_db(app)
+
+
 # db_drop_and_create_all()
 
 
@@ -21,12 +23,14 @@ def register():
     user = User(
         username=username,
         password=bcrypt.generate_password_hash(password).decode("UTF-8"),
-        email=request.json.get("email")
+        email=request.json.get("email"),
+        first_name=request.json.get("firstName"),
+        last_name=request.json.get("lastName")
     )
     user.insert()
     access_token = encode_auth_token(user.username)
 
-    return jsonify({"success": True, "access_token": access_token}), 201
+    return jsonify({"success": True, "access_token": access_token, "user": user.dictionary()}), 201
 
 
 @app.route("/login", methods=["POST"])
@@ -40,7 +44,7 @@ def login():
         return abort(406, "NOT_ACCEPTABLE: Wrong Password")
     access_token = encode_auth_token(username)
 
-    return jsonify({"success": True, "access_token": access_token}), 202
+    return jsonify({"success": True, "access_token": access_token, "user": user.dictionary()}), 202
 
 
 @app.route("/schedule", methods=["POST"])

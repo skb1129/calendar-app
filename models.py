@@ -38,6 +38,8 @@ class User(db.Model):
     username = Column(String(80), nullable=False, unique=True)
     password = Column(String(128), nullable=False)
     email = Column(String(80))
+    first_name = Column(String(80))
+    last_name = Column(String(80))
 
     def insert(self):
         try:
@@ -51,6 +53,14 @@ class User(db.Model):
             db.session.commit()
         except IntegrityError as exception:
             return abort(400, "BAD_REQUEST: Unable to update user.")
+
+    def dictionary(self):
+        return {
+            "username": self.username,
+            "email": self.email,
+            "firstName": self.first_name,
+            "lastName": self.last_name
+        }
 
     @staticmethod
     def get_by_username(username):
