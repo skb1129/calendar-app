@@ -15,7 +15,7 @@ import TopBar from "./TopBar";
 
 const useStyles = makeStyles((theme) => ({
   paper: {
-    marginTop: theme.spacing(2),
+    marginTop: theme.spacing(10),
   },
   avatar: {
     width: theme.spacing(7),
@@ -27,9 +27,6 @@ const useStyles = makeStyles((theme) => ({
   divider: {
     marginTop: theme.spacing(2),
     marginBottom: theme.spacing(2),
-  },
-  button: {
-    marginTop: theme.spacing(2),
   },
 }));
 
@@ -57,9 +54,9 @@ function Home() {
         {user.email && (
           <Typography variant="body1">
             <Typography component="span" variant="h6">
-              E-mail:&nbsp;&nbsp;&nbsp;
+              E-mail:&nbsp;
             </Typography>
-            {user.email}
+            <Typography component="span">{user.email}</Typography>
           </Typography>
         )}
         <ScheduleProvider>
