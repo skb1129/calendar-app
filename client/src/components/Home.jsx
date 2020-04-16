@@ -9,6 +9,8 @@ import Divider from "@material-ui/core/Divider";
 import { blueGrey } from "@material-ui/core/colors";
 
 import { useAuth } from "../contexts/AuthContext";
+import { ScheduleProvider } from "../contexts/ScheduleContext";
+import Schedule from "./Schedule";
 import TopBar from "./TopBar";
 
 const useStyles = makeStyles((theme) => ({
@@ -25,6 +27,9 @@ const useStyles = makeStyles((theme) => ({
   divider: {
     marginTop: theme.spacing(2),
     marginBottom: theme.spacing(2),
+  },
+  button: {
+    marginTop: theme.spacing(2),
   },
 }));
 
@@ -57,6 +62,9 @@ function Home() {
             {user.email}
           </Typography>
         )}
+        <ScheduleProvider>
+          <Schedule />
+        </ScheduleProvider>
       </Container>
     </>
   );
