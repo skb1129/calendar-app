@@ -4,8 +4,8 @@ import { makeStyles } from "@material-ui/core/styles";
 import Container from "@material-ui/core/Container";
 import Typography from "@material-ui/core/Typography";
 
-import TopBar from "./TopBar";
 import { useAuth } from "../contexts/AuthContext";
+import TopBar from "./TopBar";
 
 const useStyles = makeStyles((theme) => ({
   paper: {

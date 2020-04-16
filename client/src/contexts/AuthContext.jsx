@@ -50,6 +50,10 @@ function AuthProvider({ children }) {
       }
     };
     checkAuth();
+    api.interceptors.response.use(null, (error) => {
+      if (error.response.status === 401) return logout();
+      return Promise.reject(error);
+    });
   }, []);
 
   return (
