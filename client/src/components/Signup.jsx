@@ -1,15 +1,17 @@
 import React, { useCallback, useState } from "react";
 import { Link as RouteLink } from "react-router-dom";
 
+import { makeStyles } from "@material-ui/core/styles";
 import Button from "@material-ui/core/Button";
 import TextField from "@material-ui/core/TextField";
 import Link from "@material-ui/core/Link";
 import Grid from "@material-ui/core/Grid";
 import Typography from "@material-ui/core/Typography";
-import { makeStyles } from "@material-ui/core/styles";
 import Container from "@material-ui/core/Container";
+import CircularProgress from "@material-ui/core/CircularProgress";
 
-import api from "./utils/api";
+import { useAuth } from "../contexts/AuthContext";
+import api from "../utils/api";
 
 const useStyles = makeStyles((theme) => ({
   paper: {
@@ -27,24 +29,40 @@ const useStyles = makeStyles((theme) => ({
   },
 }));
 
-function Signup() {
+function Signup({ history }) {
   const classes = useStyles();
+  const { onLoginSuccess } = useAuth();
   const [firstName, setFirstName] = useState("");
   const [lastName, setLastName] = useState("");
   const [username, setUsername] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
+  const [loading, setLoading] = useState(false);
 
-  const onSubmit = useCallback(async (event) => {
-    event.preventDefault();
-    if (!firstName || !lastName || !username || !email || !password) return;
-    try {
-      await api.post("/register", { firstName, lastName, username, email, password });
-    } catch (e) {
-      setError("An error occurred while trying to log in.");
-    }
-  }, [firstName, lastName, username, email, password, setError]);
+  const onSubmit = useCallback(
+    async (event) => {
+      event.preventDefault();
+      if (!firstName || !lastName || !username || !email || !password) return;
+      setLoading(true);
+      try {
+        const { data } = await api.post("/register", { firstName, lastName, username, email, password });
+        onLoginSuccess(data);
+        setLoading(false);
+        history.replace("/");
+      } catch (e) {
+        switch (e.response.status) {
+          case 400:
+            setError("Account with the same username already exists.");
+            break;
+          default:
+            setError("An error occurred while trying to sign up.");
+        }
+        setLoading(false);
+      }
+    },
+    [firstName, lastName, username, email, password, setError]
+  );
 
   return (
     <Container component="main" maxWidth="xs">
@@ -114,9 +132,20 @@ function Signup() {
               />
             </Grid>
           </Grid>
-          {error && <Typography color="error" variant="caption">{error}</Typography>}
-          <Button type="submit" fullWidth variant="contained" color="primary" className={classes.submit}>
-            Sign Up
+          {error && (
+            <Typography color="error" variant="caption">
+              {error}
+            </Typography>
+          )}
+          <Button
+            disabled={loading}
+            type="submit"
+            fullWidth
+            variant="contained"
+            color="primary"
+            className={classes.submit}
+          >
+            {loading ? <CircularProgress size={24} /> : "Sign Up"}
           </Button>
           <Grid container justify="flex-end">
             <Grid item>

@@ -8,8 +8,10 @@ import Grid from "@material-ui/core/Grid";
 import Typography from "@material-ui/core/Typography";
 import { makeStyles } from "@material-ui/core/styles";
 import Container from "@material-ui/core/Container";
+import CircularProgress from "@material-ui/core/CircularProgress";
 
-import api from "./utils/api";
+import { useAuth } from "../contexts/AuthContext";
+import api from "../utils/api";
 
 const useStyles = makeStyles((theme) => ({
   paper: {
@@ -27,21 +29,40 @@ const useStyles = makeStyles((theme) => ({
   },
 }));
 
-function Login() {
+function Login({ history }) {
   const classes = useStyles();
+  const { onLoginSuccess } = useAuth();
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
+  const [loading, setLoading] = useState(false);
 
-  const onSubmit = useCallback(async (event) => {
-    event.preventDefault();
-    if (!username || !password) return;
-    try {
-      await api.post("/login", { username, password });
-    } catch (e) {
-      setError("An error occurred while trying to log in.");
-    }
-  }, [username, password, setError]);
+  const onSubmit = useCallback(
+    async (event) => {
+      event.preventDefault();
+      if (!username || !password) return;
+      setLoading(true);
+      try {
+        const { data } = await api.post("/login", { username, password });
+        onLoginSuccess(data);
+        setLoading(false);
+        history.replace("/");
+      } catch (e) {
+        switch (e.response.status) {
+          case 406:
+            setError("Incorrect password.");
+            break;
+          case 404:
+            setError(`Account with username "${username}" not found.`);
+            break;
+          default:
+            setError("An error occurred while trying to log in.");
+        }
+        setLoading(false);
+      }
+    },
+    [username, password, setError, setLoading, onLoginSuccess]
+  );
 
   return (
     <Container component="main" maxWidth="xs">
@@ -71,9 +92,20 @@ function Login() {
             autoComplete="current-password"
             type="password"
           />
-          {error && <Typography color="error" variant="caption">{error}</Typography>}
-          <Button type="submit" fullWidth variant="contained" color="primary" className={classes.submit}>
-            Log in
+          {error && (
+            <Typography color="error" variant="caption">
+              {error}
+            </Typography>
+          )}
+          <Button
+            disabled={loading}
+            type="submit"
+            fullWidth
+            variant="contained"
+            color="primary"
+            className={classes.submit}
+          >
+            {loading ? <CircularProgress size={24} /> : "Log in"}
           </Button>
           <Grid container>
             <Grid item xs>

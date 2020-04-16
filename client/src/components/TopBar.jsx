@@ -6,6 +6,8 @@ import Toolbar from "@material-ui/core/Toolbar";
 import Typography from "@material-ui/core/Typography";
 import Button from "@material-ui/core/Button";
 
+import { useAuth } from "../contexts/AuthContext";
+
 const useStyles = makeStyles({
   title: {
     flexGrow: 1,
@@ -14,6 +16,7 @@ const useStyles = makeStyles({
 
 function TopBar() {
   const classes = useStyles();
+  const { logout } = useAuth();
 
   return (
     <AppBar position="static">
@@ -21,7 +24,9 @@ function TopBar() {
         <Typography variant="h6" className={classes.title}>
           Dashboard
         </Typography>
-        <Button color="inherit">Log Out</Button>
+        <Button color="inherit" onClick={logout}>
+          Log Out
+        </Button>
       </Toolbar>
     </AppBar>
   );
