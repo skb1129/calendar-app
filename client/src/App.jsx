@@ -1,11 +1,19 @@
 import React from "react";
-import { Typography } from "@material-ui/core";
+import { Route, Switch } from "react-router-dom";
+
+import Container from "@material-ui/core/Container";
+
+import Login from "./Login";
+import Signup from "./Signup";
 
 function App() {
   return (
-    <div>
-      <Typography>Hello React!</Typography>
-    </div>
+    <Container>
+      <Switch>
+        <Route path="/login" component={Login} />
+        <Route path="/signup" component={Signup} />
+      </Switch>
+    </Container>
   );
 }
 
