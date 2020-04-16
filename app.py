@@ -98,7 +98,7 @@ def update_schedule(user):
 def get_schedule(user):
     schedule = Schedule.query.get(user.id)
     if not schedule:
-        return abort(404, "NOT_FOUND: No schedule found for this user.")
+        return jsonify({"success": True, "schedule": {}}), 204
     return jsonify({"success": True, "schedule": schedule.dictionary()}), 200
 
 
@@ -130,6 +130,8 @@ def create_event():
 @requires_auth
 def get_events_for_user(user):
     events = [event.dictionary() for event in Event.query.filter_by(user_id=user.id).all()]
+    if not len(events):
+        return jsonify({"success": True, "events": []}), 204
     return jsonify({"success": True, "events": events}), 200
 
 
