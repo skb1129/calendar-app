@@ -30,7 +30,7 @@ def register():
     user.insert()
     access_token = encode_auth_token(user.username)
 
-    return jsonify({"success": True, "access_token": access_token, "user": user.dictionary()}), 201
+    return jsonify({"success": True, "accessToken": access_token, "user": user.dictionary()}), 201
 
 
 @app.route("/api/login", methods=["POST"])
@@ -44,7 +44,7 @@ def login():
         return abort(406, "NOT_ACCEPTABLE: Wrong Password")
     access_token = encode_auth_token(username)
 
-    return jsonify({"success": True, "access_token": access_token, "user": user.dictionary()}), 202
+    return jsonify({"success": True, "accessToken": access_token, "user": user.dictionary()}), 202
 
 
 @app.route("/api/schedule", methods=["POST"])
