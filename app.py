@@ -84,9 +84,9 @@ def update_schedule(user):
     if days_available:
         schedule.days_available = days_available
     if start_time:
-        schedule.start_time = start_time
+        schedule.start_time = time.fromisoformat(start_time)
     if end_time:
-        schedule.end_time = end_time
+        schedule.end_time = time.fromisoformat(end_time)
     validate_schedule(schedule)
     schedule.update()
 
