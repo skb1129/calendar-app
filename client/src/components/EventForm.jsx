@@ -10,6 +10,8 @@ import Button from "@material-ui/core/Button";
 import CircularProgress from "@material-ui/core/CircularProgress";
 import Container from "@material-ui/core/Container";
 import { KeyboardDatePicker, MuiPickersUtilsProvider } from "@material-ui/pickers";
+import Alert from '@material-ui/lab/Alert';
+import Snackbar from "@material-ui/core/Snackbar";
 
 import api from "../utils/api";
 import { useAuth } from "../contexts/AuthContext";
@@ -35,6 +37,7 @@ const useStyles = makeStyles((theme) => ({
   },
   flex: {
     display: "flex",
+    justifyContent: "flex-end",
   },
   emailInput: {
     width: "100%",
@@ -51,7 +54,7 @@ function EventForm({ location, history }) {
   const [startTime, setStartTime] = useState("");
   const [endTime, setEndTime] = useState("");
   const [guestEmails, setGuestEmails] = useState([""]);
-  const [error, setError] = useState("");
+  const [message, setMessage] = useState({ type: "error", text: "" });
   const [loading, setLoading] = useState(false);
   const username = new URLSearchParams(location.search).get("username") || "";
 
@@ -92,14 +95,17 @@ function EventForm({ location, history }) {
           endTime,
           guestEmails,
         });
+        setMessage({ type: "success", text: "The event has been successfully created."});
         setLoading(false);
       } catch (e) {
-        setError(e?.response?.data?.message || "An error occurred while trying to create event.");
+        setMessage({ type: "error", text: e?.response?.data?.message || "An error occurred while trying to create event."});
         setLoading(false);
       }
     },
     [username, valid, setLoading, name, description, selectedDate, startTime, endTime, guestEmails]
   );
+
+  const handleCloseSnackbar = useCallback(() => setMessage({ type: "error", text: "" }), [setMessage]);
 
   return (
     <>
@@ -221,7 +227,7 @@ function EventForm({ location, history }) {
                   </Grid>
                 );
               })}
-              <Grid className={classes.flex} item xs={12} alignItems="flex-end">
+              <Grid className={classes.flex} item xs={12}>
                 <Button
                   variant="outlined"
                   color="primary"
@@ -231,11 +237,11 @@ function EventForm({ location, history }) {
                 </Button>
               </Grid>
             </Grid>
-            {error && (
-              <Typography color="error" variant="subtitle2">
-                {error}
-              </Typography>
-            )}
+            <Snackbar open={message.text} autoHideDuration={6000} onClose={handleCloseSnackbar}>
+              <Alert elevation={6} variant="filled" onClose={handleCloseSnackbar} severity={message.type}>
+                {message.text}
+              </Alert>
+            </Snackbar>
             <Button
               disabled={!valid || loading}
               type="submit"
