@@ -5,7 +5,7 @@ export function padStart(num) {
 
 export function formatTime(time) {
   if (!time) return time;
-  let [hh, mm, ss] = time.split(":").map((str) => Number(str));
+  let [hh, mm] = time.split(":").map((str) => Number(str));
   let meridian = "AM";
   if (!hh) {
     hh = 12;

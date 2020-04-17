@@ -10,10 +10,12 @@ import { blueGrey } from "@material-ui/core/colors";
 
 import { useAuth } from "../contexts/AuthContext";
 import Schedule from "./Schedule";
+import Events from "./Events";
 
 const useStyles = makeStyles((theme) => ({
-  paper: {
-    marginTop: theme.spacing(10),
+  root: {
+    marginTop: theme.spacing(5),
+    marginBottom: theme.spacing(5),
   },
   avatar: {
     width: theme.spacing(7),
@@ -33,8 +35,8 @@ function Home() {
   const { user } = useAuth();
 
   return (
-    <Container component="main">
-      <Grid container direction="row" alignItems="center" className={classes.paper}>
+    <Container component="main" className={classes.root}>
+      <Grid container direction="row" alignItems="center">
         <Grid item>
           <Avatar className={classes.avatar}>
             {user.firstName && user.firstName.charAt(0)}
@@ -56,6 +58,7 @@ function Home() {
         </Typography>
       )}
       <Schedule />
+      <Events />
     </Container>
   );
 }
