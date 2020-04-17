@@ -62,7 +62,7 @@ function Schedule() {
         <Typography variant="h6">
           Weekdays:&nbsp;
           <Typography component="span" variant="body1">
-            {schedule.daysAvailable.map((weekday) => weekdays[weekday]).join(", ")}
+            {[...schedule.daysAvailable].sort().map((weekday) => weekdays[weekday]).join(", ")}
           </Typography>
         </Typography>
       </Grid>

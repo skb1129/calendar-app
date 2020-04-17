@@ -10,6 +10,8 @@ import makeStyles from "@material-ui/core/styles/makeStyles";
 import Grid from "@material-ui/core/Grid";
 import TextField from "@material-ui/core/TextField";
 import Button from "@material-ui/core/Button";
+import CircularProgress from "@material-ui/core/CircularProgress";
+import Typography from "@material-ui/core/Typography";
 
 import { weekdays } from "../constants/enums";
 import { useSchedule } from "../contexts/ScheduleContext";
@@ -28,12 +30,12 @@ const useStyles = makeStyles((theme) => ({
   },
   button: {
     marginTop: theme.spacing(3),
-  }
+  },
 }));
 
 function ScheduleForm() {
   const classes = useStyles();
-  const { schedule } = useSchedule();
+  const { schedule, loading, saveSchedule, error } = useSchedule();
   const [daysAvailable, setDaysAvailable] = useState((schedule && schedule.daysAvailable) || []);
   const [startTime, setStartTime] = useState((schedule && schedule.startTime) || "");
   const [endTime, setEndTime] = useState((schedule && schedule.endTime) || "");
@@ -53,9 +55,17 @@ function ScheduleForm() {
     [daysAvailable, setDaysAvailable]
   );
 
+  const onSubmit = useCallback(
+    (event) => {
+      event.preventDefault();
+      saveSchedule({ daysAvailable, startTime, endTime });
+    },
+    [saveSchedule, daysAvailable, startTime, endTime]
+  );
+
   return (
     <Container component="main" maxWidth="xs">
-      <FormControl required component="form" className={classes.form}>
+      <FormControl required component="form" onSubmit={onSubmit} className={classes.form}>
         <Grid container spacing={10}>
           <Grid item>
             <FormLabel className={classes.label} component="legend">
@@ -105,8 +115,20 @@ function ScheduleForm() {
             />
           </Grid>
         </Grid>
-        <Button type="submit" variant="contained" color="primary" className={classes.button}>
-          Save Schedule
+        {error && (
+          <Typography color="error" variant="caption">
+            {error}
+          </Typography>
+        )}
+        <Button
+          disabled={loading}
+          fullWidth
+          type="submit"
+          variant="contained"
+          color="primary"
+          className={classes.button}
+        >
+          {loading ? <CircularProgress size={24} /> : "Save Schedule"}
         </Button>
       </FormControl>
     </Container>
