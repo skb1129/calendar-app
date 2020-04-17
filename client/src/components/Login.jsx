@@ -47,16 +47,7 @@ function Login() {
         setLoading(false);
         onLoginSuccess(data);
       } catch (e) {
-        switch (e.response.status) {
-          case 406:
-            setError("Incorrect password.");
-            break;
-          case 404:
-            setError(`Account with username "${username}" not found.`);
-            break;
-          default:
-            setError("An error occurred while trying to log in.");
-        }
+        setError(e?.response?.data?.message || "An error occurred while trying to log in.");
         setLoading(false);
       }
     },

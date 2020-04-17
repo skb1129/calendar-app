@@ -94,7 +94,7 @@ function EventForm({ location, history }) {
         });
         setLoading(false);
       } catch (e) {
-        setError("An error occurred while trying to create event.");
+        setError(e?.response?.data?.message || "An error occurred while trying to create event.");
         setLoading(false);
       }
     },
@@ -232,7 +232,7 @@ function EventForm({ location, history }) {
               </Grid>
             </Grid>
             {error && (
-              <Typography color="error" variant="caption">
+              <Typography color="error" variant="subtitle2">
                 {error}
               </Typography>
             )}

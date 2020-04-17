@@ -50,13 +50,7 @@ function Signup() {
         setLoading(false);
         onLoginSuccess(data);
       } catch (e) {
-        switch (e.response.status) {
-          case 400:
-            setError("Account with the same username already exists.");
-            break;
-          default:
-            setError("An error occurred while trying to sign up.");
-        }
+        setError(e?.response?.data?.message || "An error occurred while trying to sign up.");
         setLoading(false);
       }
     },

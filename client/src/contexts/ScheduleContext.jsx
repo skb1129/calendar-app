@@ -20,7 +20,7 @@ function ScheduleProvider({ children }) {
         const { data } = await api.get("/schedule");
         data.schedule && setSchedule(data.schedule);
       } catch (e) {
-        setError("An error occurred while fetching the schedule.");
+        setError(e?.response?.data?.message || "An error occurred while fetching the schedule.");
       }
       setLoading(false);
     };
@@ -40,7 +40,7 @@ function ScheduleProvider({ children }) {
       setSchedule(postData);
       history.push("/");
     } catch (e) {
-      setError("An error occurred while saving the schedule.");
+      setError(e?.response?.data?.message || "An error occurred while saving the schedule.");
     }
     setLoading(false);
   }, [schedule, setSchedule, setLoading, setError, history]);

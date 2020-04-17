@@ -42,7 +42,7 @@ function Events() {
         const { data } = await api.get("/event");
         data.events && setEvents(data.events);
       } catch (e) {
-        setError("An error occurred while fetching the events.");
+        setError(e?.response?.data?.message || "An error occurred while fetching the events.");
       }
       setLoading(false);
     };
