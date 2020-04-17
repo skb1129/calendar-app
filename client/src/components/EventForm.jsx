@@ -27,6 +27,13 @@ const useStyles = makeStyles((theme) => ({
   submit: {
     margin: theme.spacing(3, 0, 2),
   },
+  flex: {
+    display: "flex",
+  },
+  emailInput: {
+    width: "100%",
+    marginRight: theme.spacing(1)
+  },
 }));
 
 function EventForm() {
@@ -36,7 +43,7 @@ function EventForm() {
   const [selectedDate, setSelectedDate] = useState(initialDate);
   const [startTime, setStartTime] = useState("");
   const [endTime, setEndTime] = useState("");
-  const [guestEmails, setGuestEmails] = useState([]);
+  const [guestEmails, setGuestEmails] = useState([""]);
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
 
@@ -117,6 +124,36 @@ function EventForm() {
                   step: 1800, // 30 min
                 }}
               />
+            </Grid>
+            {Object.keys(guestEmails).map((key) => {
+              const state = [...guestEmails];
+              return (
+                <Grid className={classes.flex} item xs={12} key={key}>
+                  <TextField
+                    required
+                    className={classes.emailInput}
+                    value={guestEmails[key]}
+                    onChange={(event) => {
+                      state[key] = event.target.value;
+                      setGuestEmails(state);
+                    }}
+                    name={`guest_email_${key}`}
+                    variant="outlined"
+                    label={`Guest Email ${key}`}
+                  />
+                  <Button variant="outlined" color="secondary" onClick={() => {
+                    state.splice(Number(key), 1);
+                    setGuestEmails(state);
+                  }}>
+                    Remove
+                  </Button>
+                </Grid>
+              );
+            })}
+            <Grid className={classes.flex} item xs={12} alignItems="flex-end">
+              <Button variant="outlined" color="primary" onClick={() => setGuestEmails([...guestEmails].concat([""]))}>
+                Add Guest Email
+              </Button>
             </Grid>
           </Grid>
           {error && (
