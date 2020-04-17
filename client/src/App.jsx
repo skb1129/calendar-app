@@ -7,13 +7,20 @@ import { AuthProvider, useAuth } from "./contexts/AuthContext";
 import Login from "./components/Login";
 import Signup from "./components/Signup";
 import Home from "./components/Home";
+import ScheduleForm from "./components/ScheduleForm";
+import { ScheduleProvider } from "./contexts/ScheduleContext";
 
 function PrivateRoute({ component: Component, ...rest }) {
   const { isAuthenticated, loading } = useAuth();
 
   const render = (props) => {
     if (loading) return <CircularProgress size={40} />;
-    if (isAuthenticated) return <Component {...props} />;
+    if (isAuthenticated)
+      return (
+        <ScheduleProvider>
+          <Component {...props} />
+        </ScheduleProvider>
+      );
     return <Redirect to="/login" />;
   };
 
@@ -25,6 +32,7 @@ function App() {
     <AuthProvider>
       <Switch>
         <PrivateRoute exact path="/" component={Home} />
+        <PrivateRoute exact path="/schedule" component={ScheduleForm} />
         <Route exact path="/login" component={Login} />
         <Route exact path="/signup" component={Signup} />
         <Redirect to="/" />

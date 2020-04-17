@@ -1,4 +1,5 @@
 import React from "react";
+import { Link } from "react-router-dom";
 
 import { makeStyles } from "@material-ui/core/styles";
 import CircularProgress from "@material-ui/core/CircularProgress";
@@ -35,7 +36,7 @@ function Schedule() {
 
   if (!schedule)
     return (
-      <Button variant="contained" color="primary" className={classes.button}>
+      <Button component={Link} to="/schedule" variant="contained" color="primary" className={classes.button}>
         Create Schedule
       </Button>
     );
@@ -65,7 +66,7 @@ function Schedule() {
           </Typography>
         </Typography>
       </Grid>
-      <Button variant="contained" color="primary" className={classes.button}>
+      <Button component={Link} to="/schedule" variant="contained" color="primary" className={classes.button}>
         Edit Schedule
       </Button>
     </Grid>

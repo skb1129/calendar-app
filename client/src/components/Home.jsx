@@ -9,7 +9,6 @@ import Divider from "@material-ui/core/Divider";
 import { blueGrey } from "@material-ui/core/colors";
 
 import { useAuth } from "../contexts/AuthContext";
-import { ScheduleProvider } from "../contexts/ScheduleContext";
 import Schedule from "./Schedule";
 import TopBar from "./TopBar";
 
@@ -59,9 +58,7 @@ function Home() {
             <Typography component="span">{user.email}</Typography>
           </Typography>
         )}
-        <ScheduleProvider>
-          <Schedule />
-        </ScheduleProvider>
+        <Schedule />
       </Container>
     </>
   );
