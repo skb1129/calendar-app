@@ -11,17 +11,20 @@ import Home from "./components/Home";
 import ScheduleForm from "./components/ScheduleForm";
 import TopBar from "./components/TopBar";
 import EventForm from "./components/EventForm";
+import Error from "./components/Error";
 
 const PRIVATE_ROUTES = {
   HOME: "/",
   SCHEDULE: "/schedule",
   EVENT: "/event",
+  ERROR: "/error",
 };
 
 const OPEN_ROUTES = {
   LOGIN: "/login",
   SIGNUP: "/signup",
   EVENT: "/event",
+  ERROR: "/error",
 };
 
 function PrivateRoute({ component: Component, ...rest }) {
@@ -51,6 +54,7 @@ function App() {
         <Route exact path={OPEN_ROUTES.LOGIN} component={Login} />
         <Route exact path={OPEN_ROUTES.SIGNUP} component={Signup} />
         <Route exact path={OPEN_ROUTES.EVENT} component={EventForm} />
+        <Route exact path={OPEN_ROUTES.ERROR} component={Error} />
         <Redirect to="/" />
       </Switch>
     </AuthProvider>
