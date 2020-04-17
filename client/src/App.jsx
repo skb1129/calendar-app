@@ -4,12 +4,13 @@ import { Route, Switch, Redirect } from "react-router-dom";
 import CircularProgress from "@material-ui/core/CircularProgress";
 
 import { AuthProvider, useAuth } from "./contexts/AuthContext";
+import { ScheduleProvider } from "./contexts/ScheduleContext";
 import Login from "./components/Login";
 import Signup from "./components/Signup";
 import Home from "./components/Home";
 import ScheduleForm from "./components/ScheduleForm";
 import TopBar from "./components/TopBar";
-import { ScheduleProvider } from "./contexts/ScheduleContext";
+import EventForm from "./components/EventForm";
 
 function PrivateRoute({ component: Component, ...rest }) {
   const { isAuthenticated, loading } = useAuth();
@@ -37,6 +38,7 @@ function App() {
         <PrivateRoute exact path="/schedule" component={ScheduleForm} />
         <Route exact path="/login" component={Login} />
         <Route exact path="/signup" component={Signup} />
+        <Route exact path="/event" component={EventForm} />
         <Redirect to="/" />
       </Switch>
     </AuthProvider>

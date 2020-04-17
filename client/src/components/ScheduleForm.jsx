@@ -106,7 +106,7 @@ function ScheduleForm() {
                 shrink: true,
               }}
               inputProps={{
-                step: 300, // 5 min
+                step: 1800, // 30 min
               }}
             />
             <TextField
@@ -119,7 +119,7 @@ function ScheduleForm() {
                 shrink: true,
               }}
               inputProps={{
-                step: 300, // 5 min
+                step: 1800, // 30 min
               }}
             />
           </Grid>
