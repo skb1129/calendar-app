@@ -58,10 +58,13 @@ function ScheduleForm() {
   const onSubmit = useCallback(
     (event) => {
       event.preventDefault();
-      saveSchedule({ daysAvailable, startTime, endTime });
+      if (daysAvailable.length && startTime && endTime && startTime < endTime)
+        saveSchedule({ daysAvailable, startTime, endTime });
     },
     [saveSchedule, daysAvailable, startTime, endTime]
   );
+
+  const valid = daysAvailable.length && startTime && endTime && startTime < endTime;
 
   return (
     <Container component="main" maxWidth="xs">
@@ -121,7 +124,7 @@ function ScheduleForm() {
           </Typography>
         )}
         <Button
-          disabled={loading}
+          disabled={!valid || loading}
           fullWidth
           type="submit"
           variant="contained"
