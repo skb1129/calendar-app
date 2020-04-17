@@ -46,6 +46,15 @@ function Home() {
         <Grid item>
           <Typography variant="h4">{`${user.firstName} ${user.lastName}`}</Typography>
           <Typography variant="subtitle1">@{user.username}</Typography>
+          <Typography variant="subtitle2">
+            <span>Schedule Events At: </span>
+            <Typography
+              component="a"
+              target="_blank"
+              href={`${window.location.origin}/event?${user.username}`}
+              variant="subtitle1"
+            >{`${window.location.origin}/event?${user.username}`}</Typography>
+          </Typography>
         </Grid>
       </Grid>
       <Divider className={classes.divider} />
