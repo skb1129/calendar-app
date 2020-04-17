@@ -1,6 +1,7 @@
-import React, { useState } from "react";
-import DateFnsUtils from "@date-io/date-fns";
+import React, { useCallback, useState } from "react";
+import format from "date-fns/format";
 
+import DateFnsUtils from "@date-io/date-fns";
 import { makeStyles } from "@material-ui/core/styles";
 import Typography from "@material-ui/core/Typography";
 import Grid from "@material-ui/core/Grid";
@@ -9,6 +10,8 @@ import Button from "@material-ui/core/Button";
 import CircularProgress from "@material-ui/core/CircularProgress";
 import Container from "@material-ui/core/Container";
 import { KeyboardDatePicker, MuiPickersUtilsProvider } from "@material-ui/pickers";
+
+import api from "../utils/api";
 
 const initialDate = new Date();
 initialDate.setHours(0, 0, 0, 0);
@@ -32,11 +35,11 @@ const useStyles = makeStyles((theme) => ({
   },
   emailInput: {
     width: "100%",
-    marginRight: theme.spacing(1)
+    marginRight: theme.spacing(1),
   },
 }));
 
-function EventForm() {
+function EventForm({ location }) {
   const classes = useStyles();
   const [name, setName] = useState("");
   const [description, setDescription] = useState("");
@@ -46,13 +49,61 @@ function EventForm() {
   const [guestEmails, setGuestEmails] = useState([""]);
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
+  const username = new URLSearchParams(location.search).get("username") || "";
+
+  const valid =
+    username &&
+    name &&
+    description &&
+    selectedDate &&
+    selectedDate >= initialDate &&
+    startTime &&
+    endTime &&
+    startTime < endTime &&
+    guestEmails.length &&
+    guestEmails.reduce((acc, cv) => acc && cv, true);
+
+  const onSubmit = useCallback(
+    async (event) => {
+      event.preventDefault();
+      if (!valid) return;
+      setLoading(true);
+      try {
+        await api.post("/event", {
+          username,
+          name,
+          description,
+          date: format(selectedDate, "yyyy-MM-dd"),
+          startTime,
+          endTime,
+          guestEmails,
+        });
+        setLoading(false);
+      } catch (e) {
+        setError("An error occurred while trying to create event.");
+        setLoading(false);
+      }
+    },
+    [username, valid, setLoading, name, description, selectedDate, startTime, endTime, guestEmails]
+  );
 
   return (
     <Container component="main" maxWidth="sm">
       <div className={classes.paper}>
         <Typography variant="h2">Create New Event</Typography>
-        <form className={classes.form}>
+        <form className={classes.form} onSubmit={onSubmit}>
           <Grid container spacing={3}>
+            <Grid item xs={12}>
+              <TextField
+                disabled
+                required
+                fullWidth
+                value={username}
+                name="username"
+                variant="outlined"
+                label="Username"
+              />
+            </Grid>
             <Grid item xs={12}>
               <TextField
                 required
@@ -141,10 +192,14 @@ function EventForm() {
                     variant="outlined"
                     label={`Guest Email ${key}`}
                   />
-                  <Button variant="outlined" color="secondary" onClick={() => {
-                    state.splice(Number(key), 1);
-                    setGuestEmails(state);
-                  }}>
+                  <Button
+                    variant="outlined"
+                    color="secondary"
+                    onClick={() => {
+                      state.splice(Number(key), 1);
+                      setGuestEmails(state);
+                    }}
+                  >
                     Remove
                   </Button>
                 </Grid>
@@ -162,7 +217,7 @@ function EventForm() {
             </Typography>
           )}
           <Button
-            disabled={loading}
+            disabled={!valid || loading}
             type="submit"
             fullWidth
             variant="contained"

@@ -7,7 +7,7 @@ const AuthContext = React.createContext({});
 
 const useAuth = () => useContext(AuthContext);
 
-function AuthProvider({ children }) {
+function AuthProvider({ privateRoutes, openRoutes, children }) {
   const history = useHistory();
   const location = useLocation();
   const [user, setUser] = useState({});
@@ -16,38 +16,38 @@ function AuthProvider({ children }) {
   const [loading, setLoading] = useState(true);
 
   const onLoginSuccess = useCallback(
-    (data, redirectUrl = "") => {
+    (data, location = null) => {
       setUser(data.user);
       setAccessToken(data.accessToken);
       setIsAuthenticated(true);
       api.defaults.headers.common.Authorization = `Bearer ${data.accessToken}`;
       localStorage.setItem("accessToken", data.accessToken);
-      history.replace(redirectUrl || "/");
+      history.replace(location || "/");
     },
     [setUser, setAccessToken, setIsAuthenticated, history]
   );
 
-  const logout = useCallback(() => {
+  const logout = useCallback((location = null) => {
     loading && setLoading(false);
     isAuthenticated && setIsAuthenticated(false);
     accessToken && setAccessToken("");
     user && user.username && setUser({});
     localStorage.removeItem("accessToken");
     delete api.defaults.headers.common.Authorization;
-    history.push("/login");
+    history.push(location || "/login");
   }, [loading, setLoading, isAuthenticated, setIsAuthenticated, accessToken, setAccessToken, user, setUser, history]);
 
   useEffect(() => {
     const checkAuth = async () => {
       const token = localStorage.getItem("accessToken");
-      if (!token) return logout();
+      if (!token) return logout(openRoutes.includes(location.pathname) ? location : null);
       api.defaults.headers.common.Authorization = `Bearer ${token}`;
       try {
         const { data } = await api.post("/check-auth");
-        onLoginSuccess({ ...data, accessToken: token }, location.pathname);
+        onLoginSuccess({ ...data, accessToken: token }, privateRoutes.includes(location.pathname) ? location : null);
         setLoading(false);
       } catch (e) {
-        logout();
+        logout(openRoutes.includes(location.pathname) ? location : null);
       }
     };
     checkAuth();

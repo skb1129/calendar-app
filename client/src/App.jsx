@@ -12,6 +12,18 @@ import ScheduleForm from "./components/ScheduleForm";
 import TopBar from "./components/TopBar";
 import EventForm from "./components/EventForm";
 
+const PRIVATE_ROUTES = {
+  HOME: "/",
+  SCHEDULE: "/schedule",
+  EVENT: "/event",
+};
+
+const OPEN_ROUTES = {
+  LOGIN: "/login",
+  SIGNUP: "/signup",
+  EVENT: "/event",
+};
+
 function PrivateRoute({ component: Component, ...rest }) {
   const { isAuthenticated, loading } = useAuth();
 
@@ -32,13 +44,13 @@ function PrivateRoute({ component: Component, ...rest }) {
 
 function App() {
   return (
-    <AuthProvider>
+    <AuthProvider privateRoutes={Object.values(PRIVATE_ROUTES)} openRoutes={Object.values(OPEN_ROUTES)}>
       <Switch>
-        <PrivateRoute exact path="/" component={Home} />
-        <PrivateRoute exact path="/schedule" component={ScheduleForm} />
-        <Route exact path="/login" component={Login} />
-        <Route exact path="/signup" component={Signup} />
-        <Route exact path="/event" component={EventForm} />
+        <PrivateRoute exact path={PRIVATE_ROUTES.HOME} component={Home} />
+        <PrivateRoute exact path={PRIVATE_ROUTES.SCHEDULE} component={ScheduleForm} />
+        <Route exact path={OPEN_ROUTES.LOGIN} component={Login} />
+        <Route exact path={OPEN_ROUTES.SIGNUP} component={Signup} />
+        <Route exact path={OPEN_ROUTES.EVENT} component={EventForm} />
         <Redirect to="/" />
       </Switch>
     </AuthProvider>
