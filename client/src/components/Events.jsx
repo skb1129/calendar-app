@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useCallback, useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 
 import { makeStyles } from "@material-ui/core/styles";
@@ -7,6 +7,8 @@ import Typography from "@material-ui/core/Typography";
 import Button from "@material-ui/core/Button";
 import Grid from "@material-ui/core/Grid";
 import Card from "@material-ui/core/Card";
+import CardContent from "@material-ui/core/CardContent";
+import CardActions from "@material-ui/core/CardActions";
 import { orange } from "@material-ui/core/colors";
 
 import api from "../utils/api";
@@ -49,6 +51,39 @@ function Events() {
     getEvents();
   }, []);
 
+  const deleteEvent = useCallback(
+    async (event) => {
+      if (!event || !event.id) return;
+      try {
+        await api.delete("/event", { params: { id: event.id } });
+        const updatedEvents = events.filter((e) => e.id !== event.id);
+        setEvents(updatedEvents);
+      } catch (e) {
+        console.log("Error: ", e?.response?.data?.message);
+      }
+    },
+    [events, setEvents]
+  );
+
+  const getEventCard = (event) => (
+    <Card key={event.id} className={classes.card} elevation={3}>
+      <CardContent>
+        <Typography variant="h6">{event.name}</Typography>
+        <Typography variant="body1">{event.description}</Typography>
+        <Typography variant="subtitle1">Date: {event.date}</Typography>
+        <Typography variant="subtitle2">Starting at: {formatTime(event.startTime)}</Typography>
+        <Typography variant="subtitle2">Ending at: {formatTime(event.endTime)}</Typography>
+        <Typography variant="h6">Guests:</Typography>
+        <Typography variant="body2">{event.guestEmails.join(", ")}</Typography>
+      </CardContent>
+      <CardActions>
+        <Button size="small" color="secondary" variant="contained" onClick={() => deleteEvent(event)}>
+          Delete
+        </Button>
+      </CardActions>
+    </Card>
+  );
+
   const getCreateButton = () => (
     <Button component={Link} to="/event" variant="contained" color="primary" className={classes.button}>
       Create New Event
@@ -77,31 +112,11 @@ function Events() {
       <Grid container direction="row" spacing={5}>
         <Grid item>
           <Typography variant="h6">Past Events: </Typography>
-          {pastEvents.map((event) => (
-            <Card className={classes.card} variant="outlined">
-              <Typography variant="h6">{event.name}</Typography>
-              <Typography variant="body1">{event.description}</Typography>
-              <Typography variant="subtitle1">Date: {event.date}</Typography>
-              <Typography variant="subtitle2">Starting at: {formatTime(event.startTime)}</Typography>
-              <Typography variant="subtitle2">Ending at: {formatTime(event.endTime)}</Typography>
-              <Typography variant="h6">Guests:</Typography>
-              <Typography variant="body2">{event.guestEmails.join(", ")}</Typography>
-            </Card>
-          ))}
+          {pastEvents.map(getEventCard)}
         </Grid>
         <Grid item>
           <Typography variant="h6">Upcoming Events: </Typography>
-          {upcomingEvents.map((event) => (
-            <Card className={classes.card} elevation={3}>
-              <Typography variant="h6">{event.name}</Typography>
-              <Typography variant="body1">{event.description}</Typography>
-              <Typography variant="subtitle1">Date: {event.date}</Typography>
-              <Typography variant="subtitle2">Starting at: {formatTime(event.startTime)}</Typography>
-              <Typography variant="subtitle2">Ending at: {formatTime(event.endTime)}</Typography>
-              <Typography variant="h6">Guests:</Typography>
-              <Typography variant="body2">{event.guestEmails.join(", ")}</Typography>
-            </Card>
-          ))}
+          {upcomingEvents.map(getEventCard)}
         </Grid>
       </Grid>
       {getCreateButton()}
