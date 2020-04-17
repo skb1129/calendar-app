@@ -10,7 +10,6 @@ import { blueGrey } from "@material-ui/core/colors";
 
 import { useAuth } from "../contexts/AuthContext";
 import Schedule from "./Schedule";
-import TopBar from "./TopBar";
 
 const useStyles = makeStyles((theme) => ({
   paper: {
@@ -34,33 +33,30 @@ function Home() {
   const { user } = useAuth();
 
   return (
-    <>
-      <TopBar />
-      <Container component="main">
-        <Grid container direction="row" alignItems="center" className={classes.paper}>
-          <Grid item>
-            <Avatar className={classes.avatar}>
-              {user.firstName && user.firstName.charAt(0)}
-              {user.lastName && user.lastName.charAt(0)}
-            </Avatar>
-          </Grid>
-          <Grid item>
-            <Typography variant="h4">{`${user.firstName} ${user.lastName}`}</Typography>
-            <Typography variant="subtitle1">@{user.username}</Typography>
-          </Grid>
+    <Container component="main">
+      <Grid container direction="row" alignItems="center" className={classes.paper}>
+        <Grid item>
+          <Avatar className={classes.avatar}>
+            {user.firstName && user.firstName.charAt(0)}
+            {user.lastName && user.lastName.charAt(0)}
+          </Avatar>
         </Grid>
-        <Divider className={classes.divider} />
-        {user.email && (
-          <Typography variant="body1">
-            <Typography component="span" variant="h6">
-              E-mail:&nbsp;
-            </Typography>
-            <Typography component="span">{user.email}</Typography>
+        <Grid item>
+          <Typography variant="h4">{`${user.firstName} ${user.lastName}`}</Typography>
+          <Typography variant="subtitle1">@{user.username}</Typography>
+        </Grid>
+      </Grid>
+      <Divider className={classes.divider} />
+      {user.email && (
+        <Typography variant="body1">
+          <Typography component="span" variant="h6">
+            E-mail:&nbsp;
           </Typography>
-        )}
-        <Schedule />
-      </Container>
-    </>
+          <Typography component="span">{user.email}</Typography>
+        </Typography>
+      )}
+      <Schedule />
+    </Container>
   );
 }
 

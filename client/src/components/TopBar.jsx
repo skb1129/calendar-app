@@ -1,4 +1,5 @@
 import React from "react";
+import { Link } from "react-router-dom";
 
 import { makeStyles } from "@material-ui/core/styles";
 import AppBar from "@material-ui/core/AppBar";
@@ -11,6 +12,10 @@ import { useAuth } from "../contexts/AuthContext";
 const useStyles = makeStyles({
   title: {
     flexGrow: 1,
+    "& > a": {
+      textDecoration: "none",
+      color: "inherit"
+    },
   },
 });
 
@@ -22,7 +27,7 @@ function TopBar() {
     <AppBar position="static">
       <Toolbar>
         <Typography variant="h6" className={classes.title}>
-          Dashboard
+          <Link to="/">Calendar App</Link>
         </Typography>
         <Button color="inherit" onClick={logout}>
           Log Out

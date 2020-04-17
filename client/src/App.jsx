@@ -8,6 +8,7 @@ import Login from "./components/Login";
 import Signup from "./components/Signup";
 import Home from "./components/Home";
 import ScheduleForm from "./components/ScheduleForm";
+import TopBar from "./components/TopBar";
 import { ScheduleProvider } from "./contexts/ScheduleContext";
 
 function PrivateRoute({ component: Component, ...rest }) {
@@ -18,6 +19,7 @@ function PrivateRoute({ component: Component, ...rest }) {
     if (isAuthenticated)
       return (
         <ScheduleProvider>
+          <TopBar />
           <Component {...props} />
         </ScheduleProvider>
       );
