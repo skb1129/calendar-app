@@ -139,6 +139,21 @@ def get_events_for_user(user):
     return jsonify({"success": True, "events": events}), 200
 
 
+@app.route("/api/event", methods=["DELETE"])
+@requires_auth
+def delete_event(user):
+    event_id = request.args.get("id")
+    if not id:
+        abort(make_response(jsonify(code="BAD_REQUEST", message="Event ID not provided."), 400))
+    event = Event.query.get(event_id)
+    if not event:
+        abort(make_response(jsonify(code="NOT_FOUND", message=f"No event found with id: {event_id}."), 404))
+    if event.user_id != user.id:
+        abort(make_response(jsonify(code="FORBIDDEN", message="This event cannot be modified by you."), 403))
+    event.delete()
+    return jsonify({"success": True}), 200
+
+
 @app.errorhandler(InternalServerError)
 def server_error(error):
     return jsonify(code="SERVER_ERROR", message="An internal server error occurred."), error.code

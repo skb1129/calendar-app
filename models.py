@@ -130,8 +130,16 @@ class Event(db.Model):
         except IntegrityError as exception:
             return abort(make_response(jsonify(code="BAD_REQUEST", message="Unable to update event."), 400))
 
+    def delete(self):
+        try:
+            db.session.delete(self)
+            db.session.commit()
+        except IntegrityError as exception:
+            return abort(make_response(jsonify(code="BAD_REQUEST", message="Unable to delete event."), 400))
+
     def dictionary(self):
         return {
+            "id": self.id,
             "name": self.name,
             "guestEmails": self.guest_emails,
             "description": self.description,
