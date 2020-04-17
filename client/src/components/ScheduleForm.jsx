@@ -1,6 +1,5 @@
 import React, { useCallback, useState } from "react";
 
-import { useSchedule } from "../contexts/ScheduleContext";
 import Container from "@material-ui/core/Container";
 import FormControl from "@material-ui/core/FormControl";
 import FormLabel from "@material-ui/core/FormLabel";
@@ -8,21 +7,36 @@ import FormGroup from "@material-ui/core/FormGroup";
 import FormControlLabel from "@material-ui/core/FormControlLabel";
 import Checkbox from "@material-ui/core/Checkbox";
 import makeStyles from "@material-ui/core/styles/makeStyles";
+import Grid from "@material-ui/core/Grid";
+import TextField from "@material-ui/core/TextField";
+import Button from "@material-ui/core/Button";
+
 import { weekdays } from "../constants/enums";
+import { useSchedule } from "../contexts/ScheduleContext";
 
 const useStyles = makeStyles((theme) => ({
   form: {
     width: "100%", // Fix IE 11 issue.
     marginTop: theme.spacing(3),
   },
+  label: {
+    marginBottom: theme.spacing(3),
+  },
+  input: {
+    display: "block",
+    marginBottom: theme.spacing(3),
+  },
+  button: {
+    marginTop: theme.spacing(3),
+  }
 }));
 
 function ScheduleForm() {
   const classes = useStyles();
   const { schedule } = useSchedule();
-  const [daysAvailable, setDaysAvailable] = useState(schedule.daysAvailable);
-  const [startTime, setStartTime] = useState(schedule.startTime);
-  const [endTime, setEndTime] = useState(schedule.endTime);
+  const [daysAvailable, setDaysAvailable] = useState((schedule && schedule.daysAvailable) || []);
+  const [startTime, setStartTime] = useState((schedule && schedule.startTime) || "");
+  const [endTime, setEndTime] = useState((schedule && schedule.endTime) || "");
 
   const handleChange = useCallback(
     ({ target }) => {
@@ -42,18 +56,58 @@ function ScheduleForm() {
   return (
     <Container component="main" maxWidth="xs">
       <FormControl required component="form" className={classes.form}>
-        <FormLabel component="legend">Available Weekdays: </FormLabel>
-        <FormGroup>
-          {weekdays.map((weekday, index) => (
-            <FormControlLabel
-              key={weekday}
-              control={
-                <Checkbox checked={daysAvailable.includes(index)} onChange={handleChange} name={String(index)} />
-              }
-              label={weekday}
+        <Grid container spacing={10}>
+          <Grid item>
+            <FormLabel className={classes.label} component="legend">
+              Available Weekdays:{" "}
+            </FormLabel>
+            <FormGroup>
+              {weekdays.map((weekday, index) => (
+                <FormControlLabel
+                  key={weekday}
+                  control={
+                    <Checkbox checked={daysAvailable.includes(index)} onChange={handleChange} name={String(index)} />
+                  }
+                  label={weekday}
+                />
+              ))}
+            </FormGroup>
+          </Grid>
+          <Grid item>
+            <FormLabel className={classes.label} component="legend">
+              Schedule Timings:{" "}
+            </FormLabel>
+            <TextField
+              className={classes.input}
+              label="Start time"
+              type="time"
+              value={startTime}
+              onChange={(event) => setStartTime(event.target.value)}
+              InputLabelProps={{
+                shrink: true,
+              }}
+              inputProps={{
+                step: 300, // 5 min
+              }}
             />
-          ))}
-        </FormGroup>
+            <TextField
+              className={classes.input}
+              label="End Time"
+              type="time"
+              value={endTime}
+              onChange={(event) => setEndTime(event.target.value)}
+              InputLabelProps={{
+                shrink: true,
+              }}
+              inputProps={{
+                step: 300, // 5 min
+              }}
+            />
+          </Grid>
+        </Grid>
+        <Button type="submit" variant="contained" color="primary" className={classes.button}>
+          Save Schedule
+        </Button>
       </FormControl>
     </Container>
   );
