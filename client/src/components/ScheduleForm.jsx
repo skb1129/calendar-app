@@ -1,4 +1,4 @@
-import React, { useCallback, useState } from "react";
+import React, { useCallback, useEffect, useState } from "react";
 
 import Container from "@material-ui/core/Container";
 import FormControl from "@material-ui/core/FormControl";
@@ -39,6 +39,12 @@ function ScheduleForm() {
   const [daysAvailable, setDaysAvailable] = useState((schedule && schedule.daysAvailable) || []);
   const [startTime, setStartTime] = useState((schedule && schedule.startTime) || "");
   const [endTime, setEndTime] = useState((schedule && schedule.endTime) || "");
+
+  useEffect(() => {
+    schedule && schedule.daysAvailable && setDaysAvailable(schedule.daysAvailable);
+    schedule && schedule.startTime && setStartTime(schedule.startTime);
+    schedule && schedule.endTime && setEndTime(schedule.endTime);
+  }, [schedule]);
 
   const handleChange = useCallback(
     ({ target }) => {

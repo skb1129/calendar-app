@@ -1,5 +1,5 @@
 import React, { useCallback, useContext, useEffect, useState } from "react";
-import { useHistory } from "react-router";
+import { useHistory, useLocation } from "react-router";
 
 import api from "../utils/api";
 
@@ -9,19 +9,20 @@ const useAuth = () => useContext(AuthContext);
 
 function AuthProvider({ children }) {
   const history = useHistory();
+  const location = useLocation();
   const [user, setUser] = useState({});
   const [accessToken, setAccessToken] = useState("");
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [loading, setLoading] = useState(true);
 
   const onLoginSuccess = useCallback(
-    (data) => {
+    (data, redirectUrl = "") => {
       setUser(data.user);
       setAccessToken(data.accessToken);
       setIsAuthenticated(true);
       api.defaults.headers.common.Authorization = `Bearer ${data.accessToken}`;
       localStorage.setItem("accessToken", data.accessToken);
-      history.replace("/");
+      history.replace(redirectUrl || "/");
     },
     [setUser, setAccessToken, setIsAuthenticated, history]
   );
@@ -43,7 +44,7 @@ function AuthProvider({ children }) {
       api.defaults.headers.common.Authorization = `Bearer ${token}`;
       try {
         const { data } = await api.post("/check-auth");
-        onLoginSuccess({ ...data, accessToken: token });
+        onLoginSuccess({ ...data, accessToken: token }, location.pathname);
         setLoading(false);
       } catch (e) {
         logout();
