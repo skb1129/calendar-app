@@ -15,7 +15,3 @@ Thumbs.db
 
 # IntelliJ
 .idea/
-
-# Generated Assets
-static/
-templates/
