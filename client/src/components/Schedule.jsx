@@ -36,9 +36,11 @@ function Schedule() {
 
   if (!schedule)
     return (
-      <Button component={Link} to="/schedule" variant="contained" color="primary" className={classes.button}>
-        Create Schedule
-      </Button>
+      <Grid container>
+        <Button component={Link} to="/schedule" variant="contained" color="primary" className={classes.button}>
+          Create Schedule
+        </Button>
+      </Grid>
     );
 
   return (
