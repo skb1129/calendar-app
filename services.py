@@ -1,6 +1,6 @@
 from flask import abort, jsonify, make_response
 
-from .models import Schedule, Event
+from models import Schedule, Event
 
 
 def validate_event(event):

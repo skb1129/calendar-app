@@ -12,6 +12,7 @@ sqlalchemy = "*"
 pyjwt = "*"
 psycopg2-binary = "*"
 flask-bcrypt = "*"
+gunicorn = "*"
 
 [requires]
 python_version = "3.7"

@@ -3,8 +3,8 @@ from datetime import datetime, timedelta
 from functools import wraps
 from flask import request, abort, jsonify, make_response
 
-from .config import SECRET_KEY
-from .models import User
+from config import SECRET_KEY
+from models import User
 
 
 def encode_auth_token(username):

@@ -4,9 +4,9 @@ from flask_bcrypt import Bcrypt
 from jinja2 import TemplateNotFound
 from werkzeug.exceptions import InternalServerError
 
-from .auth import encode_auth_token, requires_auth
-from .models import setup_db, User, Schedule, Event, db_drop_and_create_all
-from .services import validate_schedule, validate_event
+from auth import encode_auth_token, requires_auth
+from models import setup_db, User, Schedule, Event, db_drop_and_create_all
+from services import validate_schedule, validate_event
 
 app = Flask(__name__, static_url_path="")
 bcrypt = Bcrypt(app)
