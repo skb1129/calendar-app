@@ -1,0 +1,462 @@
+{
+	"info": {
+		"_postman_id": "f396de62-4589-4fdc-a6df-c83be7fe1023",
+		"name": "Calendar App",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "Create User",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "519daacb-3208-4f84-a303-861242c787bd",
+						"exec": [
+							"var jsonData = pm.response.json();",
+							"pm.globals.set(\"access_token\", jsonData.accessToken);",
+							"",
+							"pm.test(\"User succesfully created\", function () {",
+							"    pm.expect(pm.response.code).to.be.oneOf([201,202]);",
+							"});",
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n\t\"firstName\": \"Test\",\n\t\"lastName\": \"User\",\n\t\"username\": \"testuser\",\n\t\"password\": \"password\",\n\t\"email\": \"testuser@gmail.com\"\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{origin}}/register",
+					"host": [
+						"{{origin}}"
+					],
+					"path": [
+						"register"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Login",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "1b79ade4-5a51-4bae-8e12-2e7938d11aea",
+						"exec": [
+							"var jsonData = pm.response.json();",
+							"pm.globals.set(\"access_token\", jsonData.accessToken);",
+							"",
+							"pm.test(\"Successful login\", function () {",
+							"    pm.expect(pm.response.code).to.be.oneOf([201,202]);",
+							"});",
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n\t\"username\": \"testuser\",\n\t\"password\": \"password\"\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{origin}}/login",
+					"host": [
+						"{{origin}}"
+					],
+					"path": [
+						"login"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Check Auth",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "f2432e38-bc55-4d0e-9f28-4bd12620a723",
+						"exec": [
+							"pm.test(\"Token is authenticated\", function () {",
+							"    pm.expect(pm.response.code).to.be.oneOf([201,202]);",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{access_token}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "POST",
+				"header": [],
+				"url": {
+					"raw": "{{origin}}/check-auth",
+					"host": [
+						"{{origin}}"
+					],
+					"path": [
+						"check-auth"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Save Schedule",
+			"event": [
+				{
+					"listen": "prerequest",
+					"script": {
+						"id": "dfe07bb6-0884-4536-bdd1-5d933d229f4c",
+						"exec": [
+							""
+						],
+						"type": "text/javascript"
+					}
+				},
+				{
+					"listen": "test",
+					"script": {
+						"id": "9ac8aaf4-80c8-4d4a-8f96-d02628145f1a",
+						"exec": [
+							"pm.test(\"Schedule successfully saved\", function () {",
+							"    var jsonData = pm.response.json();",
+							"    pm.expect(jsonData.success).to.eql(true);",
+							"});",
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{access_token}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"daysAvailable\": [\n        0,\n        1,\n        2,\n        3,\n        4\n    ],\n    \"startTime\": \"10:00:00\",\n    \"endTime\": \"19:00:00\"\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{origin}}/schedule",
+					"host": [
+						"{{origin}}"
+					],
+					"path": [
+						"schedule"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Update Schedule",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "5b915290-032f-428c-8256-7e6f191eb893",
+						"exec": [
+							"pm.test(\"Schedule successfully updated\", function () {",
+							"    var jsonData = pm.response.json();",
+							"    pm.expect(jsonData.success).to.eql(true);",
+							"});",
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{access_token}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "PUT",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"daysAvailable\": [\n        0,\n        1,\n        2,\n        3,\n        4,\n        5\n    ],\n    \"startTime\": \"11:00:00\",\n    \"endTime\": \"19:00:00\"\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{origin}}/schedule",
+					"host": [
+						"{{origin}}"
+					],
+					"path": [
+						"schedule"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Get Schedule",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "d111e141-502e-471f-a965-f5936007d6ff",
+						"exec": [
+							"pm.test(\"Schedule successfully received\", function () {",
+							"    var jsonData = pm.response.json();",
+							"    pm.expect(jsonData.success).to.eql(true);",
+							"    pm.expect(jsonData).to.have.property(\"schedule\");",
+							"});",
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{access_token}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{origin}}/schedule",
+					"host": [
+						"{{origin}}"
+					],
+					"path": [
+						"schedule"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Create Event",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "45b89db7-5c73-450f-8e0e-8cbf76d33646",
+						"exec": [
+							"pm.test(\"Event created\", function () {",
+							"    var jsonData = pm.response.json();",
+							"    pm.expect(jsonData.success).to.eql(true);",
+							"});",
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n\t\"name\": \"Super Event\",\n\t\"guestEmails\": [\"testboss@gmail.com\"],\n\t\"description\": \"Super duper gaming event for the best gamers in the city.\",\n\t\"date\": \"2020-05-12\",\n\t\"startTime\": \"13:00\",\n\t\"endTime\": \"14:00\",\n\t\"username\": \"testuser\"\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{origin}}/event",
+					"host": [
+						"{{origin}}"
+					],
+					"path": [
+						"event"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Get Events for User",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "eeb1710c-5339-43b2-b895-577eaee8535e",
+						"exec": [
+							"pm.test(\"Events successfully received\", function () {",
+							"    var jsonData = pm.response.json();",
+							"    pm.expect(jsonData.success).to.eql(true);",
+							"    pm.expect(jsonData).to.have.property(\"events\");",
+							"});",
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{access_token}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{origin}}/event",
+					"host": [
+						"{{origin}}"
+					],
+					"path": [
+						"event"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Delete Event",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "75aac041-9589-44cf-a7cb-e2840a770332",
+						"exec": [
+							"pm.test(\"Successfully deleted event\", function () {",
+							"    var jsonData = pm.response.json();",
+							"    pm.expect(jsonData.success).to.eql(true);",
+							"});",
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{access_token}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "DELETE",
+				"header": [],
+				"url": {
+					"raw": "{{origin}}/event?id=1",
+					"host": [
+						"{{origin}}"
+					],
+					"path": [
+						"event"
+					],
+					"query": [
+						{
+							"key": "id",
+							"value": "1"
+						}
+					]
+				}
+			},
+			"response": []
+		}
+	],
+	"event": [
+		{
+			"listen": "prerequest",
+			"script": {
+				"id": "5790be54-5fc5-462f-8606-d69bfcd60462",
+				"type": "text/javascript",
+				"exec": [
+					""
+				]
+			}
+		},
+		{
+			"listen": "test",
+			"script": {
+				"id": "0da96527-3c13-4d6a-8331-e648822d786a",
+				"type": "text/javascript",
+				"exec": [
+					""
+				]
+			}
+		}
+	],
+	"variable": [
+		{
+			"id": "47e8ae04-6809-4a81-8981-d8ef3e45634f",
+			"key": "origin",
+			"value": "http://localhost:5000/api",
+			"type": "string"
+		}
+	],
+	"protocolProfileBehavior": {}
+}
