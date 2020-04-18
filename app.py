@@ -1,18 +1,27 @@
-from flask import Flask, request, jsonify, abort, make_response
+from flask import Flask, request, jsonify, abort, make_response, render_template
 from datetime import date, time
 from flask_bcrypt import Bcrypt
+from jinja2 import TemplateNotFound
 from werkzeug.exceptions import InternalServerError
 
 from .auth import encode_auth_token, requires_auth
 from .models import setup_db, User, Schedule, Event, db_drop_and_create_all
 from .services import validate_schedule, validate_event
 
-app = Flask(__name__)
+app = Flask(__name__, static_url_path="")
 bcrypt = Bcrypt(app)
 setup_db(app)
 
-
 db_drop_and_create_all()
+
+
+@app.errorhandler(404)
+def catch_all(e):
+    try:
+        render = render_template("index.html")
+    except TemplateNotFound as exception:
+        return e
+    return render, 200
 
 
 @app.route("/api/register", methods=["POST"])
