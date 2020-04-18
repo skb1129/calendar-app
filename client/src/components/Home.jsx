@@ -51,9 +51,9 @@ function Home() {
             <Typography
               component="a"
               target="_blank"
-              href={`${window.location.origin}/event?${user.username}`}
+              href={`${window.location.origin}/event?username=${user.username}`}
               variant="subtitle1"
-            >{`${window.location.origin}/event?${user.username}`}</Typography>
+            >{`${window.location.origin}/event?username=${user.username}`}</Typography>
           </Typography>
         </Grid>
       </Grid>
