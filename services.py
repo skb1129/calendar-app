@@ -26,7 +26,7 @@ def validate_event(event):
         if other_event.end_time <= event.start_time < event.end_time:
             continue
         similar_events.append(other_event)
-    if len(similar_events):
+    if similar_events:
         return abort(
             make_response(jsonify(code="NOT_ACCEPTABLE", message="This event conflicts with an existing event."), 406))
     return True
